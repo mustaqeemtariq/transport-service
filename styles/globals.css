@@ -1,0 +1,37 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@600&family=Poppins:wght@500;600&display=swap");
+
+@font-face {
+  font-family: "circular";
+  font-weight: 700;
+  src: url("../public/assets/fonts/CircularStd-Bold.woff2");
+}
+
+
+@font-face {
+  font-family: "circular-book";
+  font-weight: 800;
+  src: url("../public/assets/fonts/CircularStd-Book.woff2");
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-stroke {
+  -webkit-text-stroke: 2px;
+  -webkit-font-smoothing: antialiased;
+}
+.font-stroke-point-2 {
+  -webkit-text-stroke: .2px;
+  -webkit-font-smoothing: antialiased;
+}
+.font-stroke-point-3 {
+  -webkit-text-stroke: .2px;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer utilities {
+	.input-cursor-pointer::-webkit-calendar-picker-indicator {
+	  @apply cursor-pointer;
+	}
+}

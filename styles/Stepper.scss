@@ -1,0 +1,99 @@
+.calculator-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem !important;
+}
+
+.calculator-pagination .pag-step.checked {
+  pointer-events: all;
+}
+
+.calculator-pagination .pag-step {
+  flex-direction: column;
+  min-width: 75px;
+  pointer-events: none;
+}
+
+.calculator-pagination .pag-step,
+.calculator-pagination .pag-step .step {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.calculator-pagination .pag-step .step {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e6ec;
+  border-radius: 50%;
+  position: relative;
+}
+
+// .calculator-pagination .pag-step .step:after {
+//   content: "";
+// }
+
+.calculator-pagination .pag-step .step .number {
+  font-size: 16px;
+  color: #9ba3af;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.calculator-pagination .pag-step.active .number {
+  color: #00aa6e;
+}
+
+.calculator-pagination .pag-step.active .step {
+  color: #00aa6e;
+  border-color: #00aa6e;
+  background-color: #fff;
+}
+
+.calculator-pagination .pag-step.active .label {
+  color: #00aa6e;
+}
+
+.calculator-pagination .pag-step.checked {
+  pointer-events: all;
+}
+
+.calculator-pagination .pag-step.checked .number {
+  display: none;
+}
+
+.calculator-pagination .pag-step.checked .step {
+  color: #00aa6e;
+  border-color: #00aa6e;
+  background-color: #00aa6e;
+}
+
+.calculator-pagination .pag-step.checked .step:after {
+  font-family: montway;
+  content: "\E909";
+  color: #fff;
+  font-size: 20px;
+}
+
+.calculator-pagination .pag-step.checked .label {
+  color: #00aa6e;
+}
+
+.calculator-pagination .pag-step.checked + span {
+  background-image: url("https://www.montway.com/app/themes/montway/resources/assets/images/dotted-pattern-dark.svg");
+}
+
+.calculator-pagination .pag-step .label {
+  font-size: 14px;
+  margin-top: 2px;
+  color: #9ba3af;
+}
+
+.calculator-pagination .step-dots {
+  position: relative;
+  height: 2px;
+  flex: 1;
+  top: -11px;
+  background-image: url("https://www.montway.com/app/themes/montway/resources/assets/images/dotted-pattern-gray.svg");
+}

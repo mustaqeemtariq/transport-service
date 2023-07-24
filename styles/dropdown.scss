@@ -1,0 +1,175 @@
+// dropdown
+.input-wrap {
+  position: relative;
+  z-index: auto;
+  font-size: 18px;
+  font-family: "circular pro book";
+  font-size: 16px;
+}
+
+.error-text {
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  width: 100%;
+  font-size: 12px;
+  color: #e24358;
+  pointer-events: none;
+  z-index: 1;
+  font-family: "circular pro book";
+  font-size: 16px;
+}
+
+#city_midpoint {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  width: 0;
+  z-index: -1;
+  padding: 0;
+  margin: 0;
+  font-family: "circular pro book";
+  font-size: 16px;
+}
+
+.input-wrap input {
+  height: 90px;
+  padding: 40px 16px 14px;
+  width: 100%;
+  border: 1px solid #e2e6ec;
+  border-radius: 0px;
+  position: relative;
+  font-family: "circular pro medium";
+  font-size: 18px;
+
+  &:focus {
+    outline: none;
+    border-color: #00a1ef;
+    border-radius: 0px;
+  }
+
+  &::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #9aa3af;
+    font-size: 18px;
+  }
+}
+
+.input-wrap .input-label {
+  position: absolute;
+  line-height: 20px;
+  top: 16px;
+  left: 16px;
+  font-size: 16px;
+  transition: transform 0.2s cubic-bezier(0.39, 0.575, 0.565, 1),
+    font-size 0.2s cubic-bezier(0.39, 0.575, 0.565, 1);
+  font-family: "circular pro medium";
+
+  color: #212529;
+  font-weight: 400;
+
+  @media screen and (max-width: 600px) {
+    font-size: 15px;
+  }
+}
+
+.input-wrap .list-select {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid #00a1ef;
+  max-height: 200px;
+  overflow: auto;
+  z-index: 2;
+  font-family: "circular pro medium";
+  font-size: 16px;
+
+  // @media screen and (max-width: 600px) {
+  //   max-height: 100px;
+  // }
+}
+
+.input-wrap .list-select li {
+  padding: 6px;
+  padding-left: 20px;
+  background-color: #fff;
+  font-size: 16px;
+  font-family: "circular pro medium";
+  font-size: 16px;
+}
+
+.value-wrap {
+  position: absolute;
+  top: 40px;
+  left: 16px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// #year {
+//   display: none;
+// }
+
+.input-wrap .list-select li {
+  padding: 6px;
+  padding-left: 20px;
+  background-color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: "circular pro medium";
+  font-size: 16px;
+  z-index: 99999;
+
+  &:hover {
+    background: #00a1ef;
+  }
+}
+
+.error-text {
+  position: absolute;
+  bottom: 5px;
+  left: 16px;
+  width: 100%;
+  font-size: 12px;
+  color: #e24358;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Custom date picker container */
+.datepicker-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+/* Custom date picker input */
+.datepicker-wrap input[type="date"] {
+  /* Hide the default date picker */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom date picker icon */
+.datepicker-wrap .icon-date_picker {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  /* Add a custom icon here */
+}
+
+/* Optional: Add hover and focus styles for better user experience */
+.datepicker-wrap input[type="date"]:hover,
+.datepicker-wrap input[type="date"]:focus {
+  outline: none;
+  border-color: #555;
+}

@@ -1,0 +1,22 @@
+.quote_wrapper {
+  .quote_logo_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 50px 0 90px 0;
+
+    img {
+      height: 60px;
+      object-fit: contain;
+    }
+  }
+
+  .quote_form_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding-bottom: 200px;
+  }
+}
