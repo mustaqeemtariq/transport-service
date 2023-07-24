@@ -19,12 +19,14 @@ import TaDa from "@/components/PricePage/TaDa";
 import DueNow from "@/components/Utils/DueNow";
 import InputCard from "@/components/Utils/InputCard";
 import InputStepCard from "@/components/Utils/InputStepCard";
-import { useState } from "react";
-import { InputClickCard } from "@/components/Utils/InputClickCard";
+import { useEffect, useState } from "react";
 import PencilSvg from "@/components/Svg/PencilSvg";
 import Tippy from "@tippyjs/react";
 import InfoSvg from "@/components/Svg/InfoSvg";
 import Delivery from "@/components/PricePage/Form/Delivery";
+import vehicleService from "@/components/Services/vehicle";
+import shipmentService from "@/components/Services/shipment";
+import { EditInputField } from "@/components/PricePage/Form/EditInput";
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(false);
@@ -235,9 +237,112 @@ export default function Home() {
     setCurrentStep((prev) => prev + 1);
   });
 
-  const onSubmit = handleSubmit((data) => {
-    console.log("DARA", data);
+  const onSubmit = handleSubmit((data) => {});
+
+  const [editInput, setEditInput] = useState({
+    vehicle: false,
+    zipCodeFrom: false,
+    zipCodeTo: false,
   });
+  const [vehicleYears, setVehicleYears] = useState();
+  const [vehicleBrand, setVehicleBrand] = useState();
+  const [vehicleModal, setVehicleModal] = useState();
+  const [zipCodeAddressFrom, setZipCodeAddressFrom] = useState();
+  const [zipCodeAddressTo, setZipCodeAddressTo] = useState();
+
+  const handleVehicleEditClick = () => {
+    setEditInput((prev) => ({ ...prev, vehicle: !prev.vehicle }));
+  };
+  const handleZipFromEditClick = () => {
+    setEditInput((prev) => ({ ...prev, zipCodeFrom: !prev.zipCodeFrom }));
+  };
+  const handleZipToEditClick = () => {
+    setEditInput((prev) => ({ ...prev, zipCodeTo: !prev.zipCodeTo }));
+  };
+
+  const getVehicleYears = () => {
+    vehicleService
+      .getYearsForVehicle()
+      .then((vehicle) => setVehicleYears(vehicle));
+  };
+  const getVehicleName = () => {
+    vehicleService.getNameForVehicle().then((brand) => setVehicleBrand(brand));
+  };
+  const getVehicleModal = (year, name) => {
+    vehicleService
+      .getModalForVehicle(year, name)
+      .then((modal) => setVehicleModal(modal));
+  };
+  const getZipCodeFrom = (value) => {
+    shipmentService
+      .getZipCode(value)
+      .then((zipCodeAddress) => setZipCodeAddressFrom(zipCodeAddress));
+  };
+  const getZipCodeTo = (value) => {
+    shipmentService
+      .getZipCode(value)
+      .then((zipCodeAddress) => setZipCodeAddressTo(zipCodeAddress));
+  };
+
+  useEffect(() => {
+    getVehicleYears();
+    getVehicleName();
+  }, []);
+
+  useEffect((value) => {
+    getZipCodeFrom();
+    getZipCodeTo();
+  }, []);
+
+  const [selectedYearOption, setSelectedYearOption] = useState(null);
+  const [selectedBrandOption, setSelectedBrandOption] = useState(null);
+  const [selectedModalOption, setSelectedModalOption] = useState(null);
+  const [selectedZipCodeFromOption, setSelectedZipCodeFromOption] =
+    useState(null);
+
+  const [selectedZipCodeToOption, setSelectedZipCodeToOption] = useState(null);
+
+  const yearOptions = vehicleYears?.map((year) => ({
+    label: year,
+    value: year,
+  }));
+
+  const brandOptions = vehicleBrand?.map((brand) => ({
+    label: brand,
+    value: brand,
+  }));
+  const modalOptions = vehicleModal?.map((modal) => ({
+    label: modal,
+    value: modal,
+  }));
+
+  const zipCodeFromOptions = zipCodeAddressFrom?.map((zip) => ({
+    label: zip,
+    value: zip,
+  }));
+
+  const zipCodeToOptions = zipCodeAddressTo?.map((zip) => ({
+    label: zip,
+    value: zip,
+  }));
+
+  useEffect(() => {
+    if (selectedYearOption?.value && selectedBrandOption?.value) {
+      getVehicleModal(selectedYearOption.value, selectedBrandOption.value);
+    }
+  }, [selectedYearOption, selectedBrandOption]);
+
+  useEffect(() => {
+    if (selectedZipCodeFromOption?.length >= 2) {
+      getZipCodeFrom(selectedZipCodeFromOption);
+    }
+  }, [selectedZipCodeFromOption]);
+
+  useEffect(() => {
+    if (selectedZipCodeToOption?.length >= 2) {
+      getZipCodeTo(selectedZipCodeToOption);
+    }
+  }, [selectedZipCodeToOption]);
 
   return (
     <main className="">
@@ -396,29 +501,125 @@ export default function Home() {
                   />
                 </div>
               </div>
-              {/* <InputCard
-                setclickOnInputCard={() => setclickOnInputCard(1)}
-                onClose={() => setclickOnInputCard()}
-                pen={true}
-                info={true}
-                tooltip={
-                  "Your First available date is the first date that we would try to pickup your vehicle. The majority of our customers have their vehicles picked up within 1-5 days of their first available date. If time is a critical factor for your move, please call and ask about our Guaranteed Pickup Service. Price can vary based on date."
-                }
-                title={"First avail date"}
-                name={"08/01/2023"}
-              /> */}
 
-              <InputCard
-                pen={true}
-                title={"Vehicle"}
-                name={"2021 Audi A5 Sportback"}
-              />
-              <InputCard title={"Ship from"} name={"Dallas,TX 75217"} />
-              <InputCard
-                pen={true}
-                title={"Ship to"}
-                name={"Austin, TX 78745"}
-              />
+              {!editInput.vehicle ? (
+                <InputCard
+                  pen={true}
+                  title={"Vehicle"}
+                  name={"2021 Audi A5 Sportback"}
+                  setClickOnInputCard={handleVehicleEditClick}
+                />
+              ) : (
+                <div className="grid grid-cols-3 grid-rows-4 items-center">
+                  <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
+                    <label>Vehicle</label>
+                  </div>
+
+                  <EditInputField
+                    className="col-span-2"
+                    value={selectedYearOption}
+                    onChange={(value) => setSelectedYearOption(value)}
+                    options={yearOptions}
+                  />
+                  <div className="auto-cols-min" />
+                  <EditInputField
+                    className="col-span-2"
+                    value={selectedBrandOption}
+                    onChange={(value) => setSelectedBrandOption(value)}
+                    options={brandOptions}
+                  />
+
+                  <div />
+                  <EditInputField
+                    className="col-span-2"
+                    value={selectedModalOption}
+                    onChange={(value) => setSelectedModalOption(value)}
+                    options={modalOptions}
+                  />
+                  <div />
+                  <div className="flex gap-x-1">
+                    <button className="bg-blue-500 py-3 px-5 text-white">
+                      Save
+                    </button>
+                    <button
+                      onClick={handleVehicleEditClick}
+                      className="bg-white py-3 px-5 text-gray-400"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!editInput.zipCodeFrom ? (
+                <InputCard
+                  className="col-span-2"
+                  pen={true}
+                  title={"Ship From"}
+                  setClickOnInputCard={handleZipFromEditClick}
+                  name={"Dallas,TX 75217"}
+                />
+              ) : (
+                <div className="grid grid-cols-3 grid-row-2 items-center">
+                  <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
+                    <label>Ship From</label>
+                  </div>
+                  <EditInputField
+                    className="col-span-2"
+                    value={selectedZipCodeFromOption}
+                    onValueChange={(value) =>
+                      setSelectedZipCodeFromOption(value)
+                    }
+                    options={zipCodeFromOptions}
+                  />
+                  <div />
+                  <div className="flex gap-x-1">
+                    <button className="bg-blue-500 py-3 px-5 text-white">
+                      Save
+                    </button>
+                    <button
+                      onClick={handleZipFromEditClick}
+                      className="bg-white py-3 px-5 text-gray-400"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!editInput.zipCodeTo ? (
+                <InputCard
+                  pen={true}
+                  className="col-span-2"
+                  title={"Ship To"}
+                  setClickOnInputCard={handleZipToEditClick}
+                  name={"Austin, TX 78745"}
+                />
+              ) : (
+                <div className="grid grid-cols-3 grid-row-2 items-center">
+                  <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
+                    <label>Ship To</label>
+                  </div>
+                  <EditInputField
+                    className="col-span-2"
+                    value={selectedZipCodeToOption}
+                    onValueChange={(value) => setSelectedZipCodeToOption(value)}
+                    options={zipCodeToOptions}
+                  />
+                  <div />
+                  <div className="flex gap-x-1">
+                    <button className="bg-blue-500 py-3 px-5 text-white">
+                      Save
+                    </button>
+                    <button
+                      onClick={handleZipToEditClick}
+                      className="bg-white py-3 px-5 text-gray-400"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <InputCard
                 info={true}

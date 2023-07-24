@@ -9,7 +9,6 @@ const options = [
   { value: "strawberry", label: "Strawberry" },
   { value: "vanilla", label: "Vanilla" },
 ];
-
 const InputCard = ({
   title,
   name,
@@ -18,11 +17,11 @@ const InputCard = ({
   transport,
   pen,
   tooltip,
-  setclickOnInputCard,
+  setClickOnInputCard,
   onClose,
 }) => {
   return (
-    <div className="border-b flex items-center gap-8 px-4 py-4">
+    <div className="w-fullborder-b flex items-center gap-8 px-4 py-4">
       <div className="flex items-center gap-3 min-w-[114px]">
         <p className="font-circular-book w-[86px] text-gray-400 text-base leading-none">
           {title}
@@ -31,13 +30,10 @@ const InputCard = ({
           <span className="cursor-pointer">{info && <InfoSvg />}</span>
         </Tippy>
       </div>
-      {/* <div>
-        <Select options={options} />
-      </div> */}
       {!(condition || transport) ? (
         <div className="flex items-center justify-between w-full gap-1.5">
           <p className="text-mildBlack text-base leading-none">{name}</p>
-          {pen && <PencilSvg onClick={setclickOnInputCard} />}
+          {pen && <span onClick={() => setClickOnInputCard()}><PencilSvg  /></span>}
         </div>
       ) : condition ? (
         <div className="flex flex-col gap-2.5">
