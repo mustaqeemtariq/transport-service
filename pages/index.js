@@ -297,10 +297,14 @@ export default function Home() {
   const [selectedYearOption, setSelectedYearOption] = useState(null);
   const [selectedBrandOption, setSelectedBrandOption] = useState(null);
   const [selectedModalOption, setSelectedModalOption] = useState(null);
-  const [selectedZipCodeFromOption, setSelectedZipCodeFromOption] =
+  const [fromZipCodeValue, setFromZipCodeValue] =
     useState(null);
+  const [toZipCodeValue, setToZipCodeValue] = useState(null);
 
-  const [selectedZipCodeToOption, setSelectedZipCodeToOption] = useState(null);
+  const [ zipCodeFromOption, setSelectedZipCodeFromOption] = useState(null);
+  const [ zipCodeToOption, setSelectedZipCodeToOption] = useState(null);
+
+  console.log("ASSA", zipCodeFromOption);
 
   const yearOptions = vehicleYears?.map((year) => ({
     label: year,
@@ -333,16 +337,16 @@ export default function Home() {
   }, [selectedYearOption, selectedBrandOption]);
 
   useEffect(() => {
-    if (selectedZipCodeFromOption?.length >= 2) {
-      getZipCodeFrom(selectedZipCodeFromOption);
+    if (fromZipCodeValue?.length >= 2) {
+      getZipCodeFrom(fromZipCodeValue);
     }
-  }, [selectedZipCodeFromOption]);
+  }, [fromZipCodeValue]);
 
   useEffect(() => {
-    if (selectedZipCodeToOption?.length >= 2) {
-      getZipCodeTo(selectedZipCodeToOption);
+    if (toZipCodeValue?.length >= 2) {
+      getZipCodeTo(toZipCodeValue);
     }
-  }, [selectedZipCodeToOption]);
+  }, [toZipCodeValue]);
 
   return (
     <main className="">
@@ -566,10 +570,11 @@ export default function Home() {
                   </div>
                   <EditInputField
                     className="col-span-2"
-                    value={selectedZipCodeFromOption}
+                    value={zipCodeFromOption}
                     onValueChange={(value) =>
-                      setSelectedZipCodeFromOption(value)
+                      setFromZipCodeValue(value)
                     }
+                    onChange={(value) => setSelectedZipCodeFromOption(value)}
                     options={zipCodeFromOptions}
                   />
                   <div />
@@ -602,8 +607,9 @@ export default function Home() {
                   </div>
                   <EditInputField
                     className="col-span-2"
-                    value={selectedZipCodeToOption}
-                    onValueChange={(value) => setSelectedZipCodeToOption(value)}
+                    value={zipCodeToOption}
+                    onValueChange={(value) => setToZipCodeValue(value)}
+                    onChange={(value) => setSelectedZipCodeToOption(value)}
                     options={zipCodeToOptions}
                   />
                   <div />

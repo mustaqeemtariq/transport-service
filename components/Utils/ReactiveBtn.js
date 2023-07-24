@@ -5,7 +5,7 @@ const ReactiveBtn = ({ type, title, onClick, showSvg = true }) => {
     <button
       type={type}
       onClick={onClick}
-      className="lg:w-fit px-7 h-[49px] flex items-center justify-center gap-2 bg-redishOrange rounded-sm hover:bg-opacity-90 group"
+      className="lg:w-fit px-7 h-[49px] flex items-center justify-center gap-2 bg-[#1c2341] rounded-sm hover:bg-opacity-90 group"
     >
       <div className="text-center text-white text-base font-bold leading-tight">
         {title}
