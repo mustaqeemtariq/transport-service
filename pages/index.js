@@ -208,16 +208,15 @@ export default function Home() {
       is: "Book shipment",
       then: (schema) =>
         schema
-          .matches(/^[A-Za-z]+$/, "Enter a valid name")
           .required("Card name is required"),
     }),
     startExpiry: yup.string().when("$step", {
       is: "Book shipment",
       then: (schema) => schema.required("Start date is required"),
     }),
-    endExpiry: yup.string().when("$step", {
+    securityCode: yup.number().transform((val) => (isNaN(val) ? undefined : val)).when("$step", {
       is: "Book shipment",
-      then: (schema) => schema.required("End date is required"),
+      then: (schema) => schema.required("Security Code is required"),
     }),
   });
 

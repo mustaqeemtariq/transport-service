@@ -8,7 +8,7 @@ export const EditInputField = ({ title, value, onChange, options, className, onV
   };
 
   const handleInputChange = (inputValue) => {
-onValueChange?.(inputValue)
+    onValueChange?.(inputValue)
 };
 
   return (

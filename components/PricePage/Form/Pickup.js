@@ -179,7 +179,7 @@ const Pickup = ({
       </div>
 
       {contact === "someone" && (
-        <div>
+        <div className="flex flex-col gap-y-1">
           <label htmlFor="contactName">Pickup contact's full name</label>
           <input
             {...register("contactName")}

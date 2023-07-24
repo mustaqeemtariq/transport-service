@@ -179,7 +179,7 @@ const Delivery = ({
       </div>
 
       {contact === "someone" && (
-        <div>
+        <div className="flex flex-col gap-y-1">
           <label htmlFor="deliveryContactName">Pickup contact's full name</label>
           <input
             {...register("deliveryContactName")}

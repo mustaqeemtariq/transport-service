@@ -42,17 +42,38 @@ const BookShipment = ({ register, errors, setCurrentStep, currentStep }) => {
               </div>
               <img className="w-[131px] h-[25px]" src="/assets/payment.png" />
             </div>
-            <input
-              className={`lg:w-[710px] h-[50px] px-2 bg-white rounded-sm border border-stone-300 ${errors.ccNumber && "border-2 border-red-500"}`}
-              type="tel"
-              inputmode="numeric"
-              pattern="[0-9\s]{13,19}"
-              maxLength="19"
-              {...register("ccNumber")}
-              placeholder="xxxx xxxx xxxx xxxx"
-            />
-            {errors.ccNumber && <p className="text-sm text-red-500">{errors.ccNumber.message}</p>}
-            <div className="flex items-center gap-4 max-lg:flex-wrap xl:justify-between">
+            <div className="relative flex items-center">
+              <input
+                className={`relative lg:w-[710px] h-[50px] px-2 bg-white rounded-sm border border-stone-300 ${
+                  errors.ccNumber && "border-2 border-red-500"
+                }`}
+                type="tel"
+                inputmode="numeric"
+                pattern="[0-9\s]{13,19}"
+                maxLength="16"
+                {...register("ccNumber")}
+                placeholder="xxxx xxxx xxxx xxxx"
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="absolute right-2 w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                />
+              </svg>
+            </div>
+
+            {errors.ccNumber && (
+              <p className="text-sm text-red-500">{errors.ccNumber.message}</p>
+            )}
+            <div className="flex gap-4 max-lg:flex-wrap xl:justify-between">
               <div className="flex flex-col gap-2 w-full">
                 <div className="w-[132.80px] text-gray-500 text-base font-bold leading-tight">
                   Full name on card
@@ -63,8 +84,12 @@ const BookShipment = ({ register, errors, setCurrentStep, currentStep }) => {
                   type="text"
                   className="px-2 min-w-full xl:w-[346px] h-[50px] bg-white rounded-sm border border-stone-300"
                 />
+                {errors.creditName && (
+                  <p className="text-sm text-red-500">
+                    {errors.creditName.message}
+                  </p>
+                )}
               </div>
-              {errors.creditName && <p className="text-sm text-red-500">{errors.creditName.message}</p>}
               <div className="flex flex-col gap-2  w-full">
                 <div className="text-gray-500 text-base font-bold leading-tight">
                   Expiration date
@@ -76,21 +101,30 @@ const BookShipment = ({ register, errors, setCurrentStep, currentStep }) => {
                   type="month"
                   className="px-2 min-w-full xl:w-[164px] h-[50px] bg-white rounded-sm border border-stone-300"
                 />
+                {errors.startExpiry && (
+                  <p className="text-sm text-red-500">
+                    {errors.startExpiry.message}
+                  </p>
+                )}
               </div>
-              {errors.startExpiry && <p className="text-sm text-red-500">{errors.startExpiry.message}</p>}
               <div className="flex flex-col gap-2  w-full">
                 <div className="text-gray-500 text-base font-bold leading-tight">
-                  Expiration date
+                  Security Code
                 </div>
                 <input
-                  name="endExpiry"
-                  id="expiry"
-                  {...register("endExpiry")}
-                  type="month"
+                  name="securityCode"
+                  id="code"
+                  type="tel"
+                  {...register("securityCode")}
+                  maxLength={3}
                   className="px-2 min-w-full xl:w-[164px] h-[50px] bg-white rounded-sm border border-stone-300"
                 />
+                {errors.securityCode && (
+                  <p className="text-sm text-red-500">
+                    {errors.securityCode.message}
+                  </p>
+                )}
               </div>
-              {errors.endExpiry && <p className="text-sm text-red-500">{errors.endExpiry.message}</p>}
             </div>
           </div>
         </div>
@@ -159,11 +193,7 @@ const BookShipment = ({ register, errors, setCurrentStep, currentStep }) => {
           Complete your booking to get the best price now!
         </div>
       </div>
-      <ReactiveBtn
-        title={"Book shipment"}
-        type="submit"
-        showSvg={false}
-      />
+      <ReactiveBtn title={"Book shipment"} type="submit" showSvg={false} />
 
       <div className="lg:w-[635px] font-circular-book">
         <span className="text-gray-500 text-base leading-tight">
