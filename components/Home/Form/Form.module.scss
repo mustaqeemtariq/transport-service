@@ -1,0 +1,118 @@
+._card {
+  width: 440px;
+  background-color: #f5f7fa;
+  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  // padding: 10px 16px 16px 16px;
+  height: 100%;
+  overflow: inherit;
+  @media screen and (max-width: 600px) {
+    width: 100%;
+  }
+
+  ._header_title {
+    color: #232b36;
+    font-family: "circular pro book";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 30px;
+
+    @media screen and (max-width: 600px) {
+      text-align: center;
+    }
+
+    ._span_one {
+      font-weight: 700;
+      font-family: "circular pro bold";
+    }
+
+    ._span_two {
+      color: #00a1ef;
+      text-decoration: none;
+      margin-left: 6px;
+      position: relative;
+
+      // &:hover {
+      //   text-decoration: underline;
+      // }
+
+      &::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 1px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #00a1ef;
+        transition: width 0.2s cubic-bezier(0.39, 0.575, 0.565, 1);
+      }
+
+      // when i hover after is width 100%
+      &:hover {
+        &::after {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  ._body {
+    // padding: -10px 0 10px 0;
+    padding-top: 0px !important;
+
+    ._form_wrapper {
+      padding: 10px 0 10px 0;
+    }
+
+    ._type_title {
+      color: #212529;
+      font-family: "Circular-pro";
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 31.031px; /* 150% */
+    }
+
+    ._submit_button {
+      border-radius: 0px;
+      background: #1c2431;
+      border-radius: none;
+      width: 100%;
+      height: 50px;
+      // padding: 8px 0;
+      color: #fff;
+      text-align: center;
+      font-family: "circular pro medium";
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 32.97px;
+      text-transform: capitalize;
+      transition: all 1s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      @media screen and (max-width: 600px) {
+        min-width: 290px;
+      }
+
+      svg {
+        margin-left: 20px;
+        vertical-align: middle;
+        fill: currentColor;
+        display: inline-block;
+        font-size: 1.2rem;
+        transition: all 0.6s ease-in-out;
+      }
+
+      &:hover svg {
+        margin-left: 25px;
+      }
+    }
+  }
+}

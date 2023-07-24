@@ -1,0 +1,122 @@
+._wrapper {
+  padding: 60px 0 20px 0;
+
+  @media screen and (max-width: 600px) {
+    padding: 30px 0 20px 0;
+    background: url("/images/hero.png");
+    background-position: top;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 1;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0000009c;
+
+      z-index: -1;
+    }
+  }
+
+  ._body {
+    position: relative;
+    // height: 100vh;
+    ._hero_text {
+      opacity: 0;
+      transition: transform 0.2s cubic-bezier(0.39, 0.575, 0.565, 1),
+        opacity 0.2s cubic-bezier(0.39, 0.575, 0.565, 1);
+      animation-duration: 1.5s;
+      transform: translateY(50px);
+      animation-name: fadeInAnimation;
+      animation-fill-mode: forwards;
+
+      @keyframes fadeInAnimation {
+        0% {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      ._title {
+        color: #000;
+        font-family: "circular pro medium";
+        font-size: 48px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 58px;
+        margin-bottom: 15px;
+
+        @media screen and (max-width: 600px) {
+          font-size: 32px;
+          line-height: 1.2;
+          margin-bottom: 24px;
+          color: #fff;
+        }
+      }
+      ._subtitle {
+        color: #000;
+        font-family: "circular pro book";
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 36px; /* 150% */
+
+        @media screen and (max-width: 600px) {
+          font-size: 19px;
+          line-height: 1.4;
+          color: #fff;
+        }
+      }
+    }
+
+    ._hero_image {
+      margin-top: 50px;
+      margin-left: -120px;
+      img {
+        width: 100%;
+        object-fit: contain;
+      }
+
+      @media screen and (max-width: 1024px) {
+        margin-left: 0;
+      }
+
+      @media screen and (max-width: 600px) {
+        // margin-top: 0px;
+        // margin-top: 20px;
+        display: none;
+      }
+    }
+
+    ._form {
+      position: absolute;
+      top: 20px;
+      right: -100px;
+      // transform: translateY(-50%);
+
+      @media screen and (max-width: 1024px) {
+        right: 0;
+      }
+      @media screen and (max-width: 770px) {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        margin: 30px 0 50px 0;
+      }
+
+      @media screen and (max-width: 600px) {
+        margin: -10px 0 40px 0;
+      }
+    }
+  }
+}
