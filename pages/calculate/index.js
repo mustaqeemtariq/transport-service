@@ -39,9 +39,6 @@ export default function Home() {
   const [selectedPrice, setselectedPrice] = useState(0);
   const [clickOnInputCard, setclickOnInputCard] = useState();
 
-  const router = useRouter()
-  const {cost, transit} = router.query
-
   const nameOfCurrentStep =
     currentStep == 1
       ? "Transport"
@@ -252,6 +249,8 @@ export default function Home() {
     zipCodeFrom: false,
     zipCodeTo: false,
   });
+
+  const [availableDate, setAvailableDate] = useState(state?.Transport.Available_Date)
   const [vehicleYears, setVehicleYears] = useState();
   const [vehicleBrand, setVehicleBrand] = useState();
   const [vehicleModal, setVehicleModal] = useState();
@@ -354,8 +353,9 @@ export default function Home() {
     }
   }, [toZipCodeValue]);
 
+  console.log("CCCCC", availableDate);
   return (
-    <main className="">
+    <main>
       {currentStep ? (
         <>
           <div className="sm:hidden w-full h-[94px] flex items-center justify-center gap-16 bg-slate-100">
@@ -415,7 +415,7 @@ export default function Home() {
         <div className="flex w-full max-xl:gap-7 xl:gap-8 justify-between max-lg:flex-wrap">
           <form
             onSubmit={(event) => {
-              currentStep === 4 ? onSubmit(event) : nextStep(event);
+              currentStep === 6 ? onSubmit(event) : nextStep(event);
             }}
           >
             {currentStep == "1" ? (
@@ -496,13 +496,13 @@ export default function Home() {
                   <input
                     type="date"
                     name="availableDate"
-                    value={"08/01/2023"}
+                    value={availableDate}
                     className="opacity-0 absolute z-50 w-full input-cursor-pointer"
                   />
                   <input
                     type="text"
                     disabled
-                    value={"08/01/2023"}
+                    value={state?.Transport.Available_Date}
                     className=" bg-white border-transparent py-1 pl-0 font-semibold sm:text-sm"
                   />
                   <PencilSvg
