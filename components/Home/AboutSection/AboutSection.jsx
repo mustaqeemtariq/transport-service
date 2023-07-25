@@ -1,10 +1,10 @@
 "use client";
 import { Box, Container, Grid, Typography } from "@mui/material";
 import React, { useEffect } from "react";
-import coverage from "../../../public/images/coverage.svg";
-import payment from "../../../public/images/payment.svg";
-import securePayment from "../../../public/images/secure-payment.svg";
-import support from "../../../public/images/support.svg";
+import coverage from "../../../public/assets/images/coverage.svg";
+import payment from "../../../public/assets/images/payment.svg";
+import securePayment from "../../../public/assets/images/secure-payment.svg";
+import support from "../../../public/assets/images/support.svg";
 import Image from "next/image";
 import AOS from "aos";
 

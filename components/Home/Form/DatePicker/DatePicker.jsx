@@ -3,8 +3,6 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 
 const CustomDatePicker = ({ startDate, setStartDate }) => {
-  console.log(startDate, "startDate");
-
   // eslint-disable-next-line react/display-name
   const CustomInput = React.forwardRef((props, ref) => {
     return (

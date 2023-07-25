@@ -68,11 +68,11 @@ const SelectBox = ({
             <li
               key={i}
               onClick={() => {
-                handleSelect(el?.label);
+                handleSelect(el);
                 onChange(el);
               }}
             >
-              {el?.label}
+              {el}
             </li>
           ))}
         </ul>

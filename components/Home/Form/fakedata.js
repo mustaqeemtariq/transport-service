@@ -57,23 +57,10 @@ export const vehicleModelData = [
   { value: "A5", label: "A5" },
 ];
 
-
-//json for First available date 
+//json for First available date
 export const firstAvailableDateData = [
-    {
-        value: "as-soon-as-possible",
-        label: "As soon as possible",
-    },
-    {
-        value: "with-in-2-weeks",
-        label: "Within 2 weeks",
-    },
-    {
-        value: "with-in-30days",
-        label: "Within 30 days",
-    },
-    {
-        value: "more-then-30days",
-        label: "More than 30 days",
-    }
-]
+  "As soon as possible",
+  "Within 2 weeks",
+  "Within 30 days",
+  "More than 30 days",
+];

@@ -14,7 +14,7 @@ const PriceCard = ({
         setPriceCardActive();
         setselectedPrice();
       }}
-      className={`w-full bg-blue-500 lg:max-w-[321px] h-[260px] rounded-md ${
+      className={`w-full bg-blue-600 lg:max-w-[321px] h-[260px] rounded-md ${
         active
           ? "border-borderGreen bg-white shadow-2xl"
           : "bg-liteGray border-[#9BA3B0]"

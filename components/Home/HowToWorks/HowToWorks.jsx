@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import { Box, Button, Typography } from "@mui/material";
-import stepOne from "../../../public/images/step-one.svg";
-import stepTwo from "../../../public/images/step-two.svg";
-import stepThree from "../../../public/images/step-three.svg";
+import stepOne from "../../../public/assets/images/step-one.svg";
+import stepTwo from "../../../public/assets/images/step-two.svg";
+import stepThree from "../../../public/assets/images/step-three.svg";
 import Image from "next/image";
 import CustomPopup from "../Dialog/CustomPopup";
 import Form from "../Form/Form";

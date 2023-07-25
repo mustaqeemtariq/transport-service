@@ -6,9 +6,9 @@ const CustomPhoneInput = ({
   onChange,
   title,
   placeholder,
+  setPhone,
   type,
 }) => {
-  const [phoneNumber, setPhoneNumber] = useState("");
 
   const maskPhone = (value) => {
     return value
@@ -29,8 +29,8 @@ const CustomPhoneInput = ({
         pattern="\(\d{3}\) \d{3}-\d{4}"
         placeholder="Your Phone"
         maxLength="14"
-        value={phoneNumber}
-        onChange={(e) => setPhoneNumber(maskPhone(e.target.value))}
+        value={value}
+        onChange={(e) => setPhone(maskPhone(e.target.value))}
         inputmode="text"
         data-gtm-form-interact-field-id="2"
       />
