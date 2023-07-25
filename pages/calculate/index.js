@@ -28,10 +28,18 @@ import vehicleService from "@/components/Services/vehicle";
 import shipmentService from "@/components/Services/shipment";
 import { EditInputField } from "@/components/PricePage/Form/EditInput";
 import { useRouter } from "next/router";
-import { useAppState, updateAppState } from '../appContext';
+import { useAppState, updateAppState } from "../appContext";
+import costService from "@/components/Services/cost";
+import { Spinner } from "@/components/animation/spinner";
 
 export default function Home() {
   const { state, dispatch } = useAppState();
+
+  const router = useRouter();
+  let { cost, transit } = router.query;
+
+  const [totalCost, setTotalCost] = useState(cost);
+  const [transitTime, setTransitTime] = useState(transit);
 
   console.log("CONTEXT", state);
   const [currentStep, setCurrentStep] = useState(false);
@@ -212,18 +220,19 @@ export default function Home() {
       }),
     creditName: yup.string().when("$step", {
       is: "Book shipment",
-      then: (schema) =>
-        schema
-          .required("Card name is required"),
+      then: (schema) => schema.required("Card name is required"),
     }),
     startExpiry: yup.string().when("$step", {
       is: "Book shipment",
       then: (schema) => schema.required("Start date is required"),
     }),
-    securityCode: yup.number().transform((val) => (isNaN(val) ? undefined : val)).when("$step", {
-      is: "Book shipment",
-      then: (schema) => schema.required("Security Code is required"),
-    }),
+    securityCode: yup
+      .number()
+      .transform((val) => (isNaN(val) ? undefined : val))
+      .when("$step", {
+        is: "Book shipment",
+        then: (schema) => schema.required("Security Code is required"),
+      }),
   });
 
   const {
@@ -244,13 +253,22 @@ export default function Home() {
 
   const onSubmit = handleSubmit((data) => {});
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [editInput, setEditInput] = useState({
     vehicle: false,
     zipCodeFrom: false,
     zipCodeTo: false,
   });
 
-  const [availableDate, setAvailableDate] = useState(state?.Transport.Available_Date)
+  useEffect(() => {
+    costService.getCost(state).then((res) => {
+      setTotalCost(res.Results.total);
+      setTransitTime(res.Results.transit);
+      setIsLoading(false);
+    });
+  }, [state]);
+
   const [vehicleYears, setVehicleYears] = useState();
   const [vehicleBrand, setVehicleBrand] = useState();
   const [vehicleModal, setVehicleModal] = useState();
@@ -301,15 +319,101 @@ export default function Home() {
     getZipCodeTo();
   }, []);
 
+  const handleDateUpdate = (e) => {
+    updateAppState(dispatch, {
+      ...state,
+      Transport: {
+        ...state.Transport,
+        Available_Date: e.target.value,
+      },
+    });
+  };
+
+  const handleVehicleUpdate = () => {
+    handleVehicleEditClick();
+    setIsLoading(true)
+    updateAppState(dispatch, {
+      ...state,
+      Transport: {
+        ...state.Transport,
+        Vehicles: state.Transport.Vehicles.map((vehicle, index) =>
+          index === 0
+            ? {
+                ...vehicle,
+                v_year: selectedYearOption.value,
+                v_make: selectedBrandOption.value,
+                v_model: selectedModalOption.value,
+              }
+            : vehicle
+        ),
+      },
+    });
+  };
+
+  const handleVehicleConditionUpdate = (event) => {
+    setIsLoading(true)
+    updateAppState(dispatch, {
+      ...state,
+      Transport: {
+        ...state.Transport,
+        Vehicles: state.Transport.Vehicles.map((vehicle, index) =>
+          index === 0 ? { ...vehicle, veh_op: event.target.value } : vehicle
+        ),
+      },
+    });
+  };
+
+  const handleCarrierUpdate = (e) => {
+    setIsLoading(true)
+    updateAppState(dispatch, {
+      ...state,
+      Transport: {
+        ...state.Transport,
+        Carrier: e.target.value,
+      },
+    });
+  };
+
+  const handleZipFromUpdate = () => {
+    setIsLoading(true)
+    handleZipFromEditClick();
+    updateAppState(dispatch, {
+      ...state,
+      Transport: {
+        ...state.Transport,
+        Origin: {
+          City: zipCodeFromOption.value.split(",")[0],
+          State: zipCodeFromOption.value.split(" ")[1],
+          Zipcode: zipCodeFromOption.value.split(" ")[2],
+        },
+      },
+    });
+  };
+
+  const handleZipToUpdate = () => {
+    handleZipToEditClick();
+    setIsLoading(true)
+    updateAppState(dispatch, {
+      ...state,
+      Transport: {
+        ...state.Transport,
+        Destination: {
+          City: zipCodeToOption.value.split(",")[0],
+          State: zipCodeToOption.value.split(" ")[1],
+          Zipcode: zipCodeToOption.value.split(" ")[2],
+        },
+      },
+    });
+  };
+
   const [selectedYearOption, setSelectedYearOption] = useState(null);
   const [selectedBrandOption, setSelectedBrandOption] = useState(null);
   const [selectedModalOption, setSelectedModalOption] = useState(null);
-  const [fromZipCodeValue, setFromZipCodeValue] =
-    useState(null);
+  const [fromZipCodeValue, setFromZipCodeValue] = useState(null);
   const [toZipCodeValue, setToZipCodeValue] = useState(null);
 
-  const [ zipCodeFromOption, setSelectedZipCodeFromOption] = useState(null);
-  const [ zipCodeToOption, setSelectedZipCodeToOption] = useState(null);
+  const [zipCodeFromOption, setSelectedZipCodeFromOption] = useState(null);
+  const [zipCodeToOption, setSelectedZipCodeToOption] = useState(null);
 
   const yearOptions = vehicleYears?.map((year) => ({
     label: year,
@@ -353,363 +457,373 @@ export default function Home() {
     }
   }, [toZipCodeValue]);
 
-  console.log("CCCCC", availableDate);
   return (
-    <main>
-      {currentStep ? (
-        <>
-          <div className="sm:hidden w-full h-[94px] flex items-center justify-center gap-16 bg-slate-100">
-            <ContentWrapper
-              customStyle={"!py-0 flex items-center justify-start gap-6"}
-            >
-              <InputStepCard
-                active={true}
-                number={currentStep}
-                title={nameOfCurrentStep}
-              />
-            </ContentWrapper>
-          </div>
-          <div className="max-sm:hidden w-full h-[94px] flex items-center justify-center gap-16 bg-slate-100">
-            <ContentWrapper
-              customStyle={"!py-0 flex items-center justify-center gap-6"}
-            >
-              <InputStepCard
-                active={currentStep == 1}
-                number={1}
-                complete={currentStep - 1 >= 1}
-                title={"Transport"}
-              />
-              <div className="w-[175px] h-[1px] bg-gray-300"></div>
-              <InputStepCard
-                active={currentStep == 2}
-                number={2}
-                complete={currentStep - 2 >= 1}
-                title={"Pickup"}
-              />
-              <div className="w-[175px] h-[1px] bg-gray-300"></div>
-              <InputStepCard
-                active={currentStep == 3}
-                number={3}
-                complete={currentStep - 3 >= 1}
-                title={"Delivery"}
-              />
-              <div className="w-[175px] h-[1px] bg-gray-300"></div>
-              <InputStepCard
-                active={currentStep == 4}
-                number={4}
-                complete={currentStep - 4 >= 1}
-                title={"Book shipment"}
-              />
-              <div className="w-[175px] h-[1px] bg-gray-300"></div>
-              <InputStepCard
-                active={currentStep == 5}
-                number={5}
-                complete={currentStep - 5 == 1}
-                title={"Thank you"}
-              />
-            </ContentWrapper>
-          </div>
-        </>
-      ) : null}
-      <ContentWrapper>
-        <div className="flex w-full max-xl:gap-7 xl:gap-8 justify-between max-lg:flex-wrap">
-          <form
-            onSubmit={(event) => {
-              currentStep === 6 ? onSubmit(event) : nextStep(event);
-            }}
-          >
-            {currentStep == "1" ? (
-              <Transport
-                currentStep={currentStep}
-                errors={errors}
-                control={control}
-                register={register}
-                watch={watch}
-                setCurrentStep={setCurrentStep}
-              />
-            ) : currentStep == "2" ? (
-              <Pickup
-                register={register}
-                errors={errors}
-                control={control}
-                watch={watch}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-              />
-            ) : currentStep == "3" ? (
-              <Delivery
-                register={register}
-                errors={errors}
-                control={control}
-                watch={watch}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-                delivery={true}
-              />
-            ) : currentStep == "4" ? (
-              <BookShipment
-                currentStep={currentStep}
-                register={register}
-                errors={errors}
-                setCurrentStep={setCurrentStep}
-              />
-            ) : currentStep == "5" ? (
-              <ThankYou />
-            ) : (
-              <div className="max-lg:w-full lg:w-11/12">
-                <TaDa />
-                <ServiceTopSection
-                  setselectedPrice={setselectedPrice}
-                  priceCardActive={priceCardActive}
-                  setPriceCardActive={setPriceCardActive}
-                  setCurrentStep={() => setCurrentStep(1)}
-                />
+    <>
+      {isLoading ? (
+        <Spinner className="w-12 h-12 fixed top-1/2 bottom-1/2 left-1/2 right-1/2" />
+      ) : (
+        <main>
+          {currentStep ? (
+            <>
+              <div className="sm:hidden w-full h-[94px] flex items-center justify-center gap-16 bg-slate-100">
+                <ContentWrapper
+                  customStyle={"!py-0 flex items-center justify-start gap-6"}
+                >
+                  <InputStepCard
+                    active={true}
+                    number={currentStep}
+                    title={nameOfCurrentStep}
+                  />
+                </ContentWrapper>
               </div>
-            )}
-          </form>
+              <div className="max-sm:hidden w-full h-[94px] flex items-center justify-center gap-16 bg-slate-100">
+                <ContentWrapper
+                  customStyle={"!py-0 flex items-center justify-center gap-6"}
+                >
+                  <InputStepCard
+                    active={currentStep == 1}
+                    number={1}
+                    complete={currentStep - 1 >= 1}
+                    title={"Transport"}
+                  />
+                  <div className="w-[175px] h-[1px] bg-gray-300"></div>
+                  <InputStepCard
+                    active={currentStep == 2}
+                    number={2}
+                    complete={currentStep - 2 >= 1}
+                    title={"Pickup"}
+                  />
+                  <div className="w-[175px] h-[1px] bg-gray-300"></div>
+                  <InputStepCard
+                    active={currentStep == 3}
+                    number={3}
+                    complete={currentStep - 3 >= 1}
+                    title={"Delivery"}
+                  />
+                  <div className="w-[175px] h-[1px] bg-gray-300"></div>
+                  <InputStepCard
+                    active={currentStep == 4}
+                    number={4}
+                    complete={currentStep - 4 >= 1}
+                    title={"Book shipment"}
+                  />
+                  <div className="w-[175px] h-[1px] bg-gray-300"></div>
+                  <InputStepCard
+                    active={currentStep == 5}
+                    number={5}
+                    complete={currentStep - 5 == 1}
+                    title={"Thank you"}
+                  />
+                </ContentWrapper>
+              </div>
+            </>
+          ) : null}
+          <ContentWrapper>
+            <div className="flex w-full max-xl:gap-7 xl:gap-8 justify-between max-lg:flex-wrap">
+              <form
+                onSubmit={(event) => {
+                  currentStep === 6 ? onSubmit(event) : nextStep(event);
+                }}
+              >
+                {currentStep == "1" ? (
+                  <Transport
+                    currentStep={currentStep}
+                    errors={errors}
+                    control={control}
+                    register={register}
+                    watch={watch}
+                    setCurrentStep={setCurrentStep}
+                  />
+                ) : currentStep == "2" ? (
+                  <Pickup
+                    register={register}
+                    errors={errors}
+                    control={control}
+                    watch={watch}
+                    currentStep={currentStep}
+                    setCurrentStep={setCurrentStep}
+                  />
+                ) : currentStep == "3" ? (
+                  <Delivery
+                    register={register}
+                    errors={errors}
+                    control={control}
+                    watch={watch}
+                    currentStep={currentStep}
+                    setCurrentStep={setCurrentStep}
+                    delivery={true}
+                  />
+                ) : currentStep == "4" ? (
+                  <BookShipment
+                    currentStep={currentStep}
+                    register={register}
+                    errors={errors}
+                    setCurrentStep={setCurrentStep}
+                  />
+                ) : currentStep == "5" ? (
+                  <ThankYou />
+                ) : (
+                  <div className="max-lg:w-full lg:w-11/12">
+                    <TaDa />
+                    <ServiceTopSection
+                      setselectedPrice={setselectedPrice}
+                      priceCardActive={priceCardActive}
+                      price={totalCost}
+                      setPriceCardActive={setPriceCardActive}
+                      setCurrentStep={() => setCurrentStep(1)}
+                    />
+                  </div>
+                )}
+              </form>
 
-          <div className="w-full lg:max-w-[392px] flex flex-col gap-3.5 ">
-            <div className="text-zinc-800 text-3xl font-bold leading-[30px]">
-              Details
-            </div>
-            <div className="border border-stone-500 border-opacity-30">
-              <InputCard title={"Distance"} name={"202mi"} />
+              <div className="w-full lg:max-w-[392px] flex flex-col gap-3.5 ">
+                <div className="text-zinc-800 text-3xl font-bold leading-[30px]">
+                  Details
+                </div>
+                <div className="border border-stone-500 border-opacity-30">
+                  <InputCard title={"Distance"} name={"202mi"} />
 
-              <div className="border-b flex items-center gap-8 px-4 py-4">
-                <div className="flex items-center gap-3 min-w-[114px]">
-                  <p className="font-circular-book w-[86px] text-gray-400 text-base leading-none">
-                    Set Avail Date
-                  </p>
-                  <Tippy
-                    animation=""
-                    content={
-                      "Your First available date is the first date that we would try to pickup your vehicle. The majority of our customers have their vehicles picked up within 1-5 days of their first available date. If time is a critical factor for your move, please call and ask about our Guaranteed Pickup Service. Price can vary based on date."
+                  <div className="border-b flex items-center gap-8 px-4 py-4">
+                    <div className="flex items-center gap-3 min-w-[114px]">
+                      <p className="font-circular-book w-[86px] text-gray-400 text-base leading-none">
+                        Set Avail Date
+                      </p>
+                      <Tippy
+                        animation=""
+                        content={
+                          "Your First available date is the first date that we would try to pickup your vehicle. The majority of our customers have their vehicles picked up within 1-5 days of their first available date. If time is a critical factor for your move, please call and ask about our Guaranteed Pickup Service. Price can vary based on date."
+                        }
+                      >
+                        <span className="cursor-pointer">
+                          <InfoSvg />
+                        </span>
+                      </Tippy>
+                    </div>
+
+                    <div className="w-full relative flex items-center">
+                      <input
+                        type="date"
+                        name="availableDate"
+                        onChange={handleDateUpdate}
+                        value={state?.Transport.Available_Date}
+                        className="opacity-0 absolute z-50 w-full input-cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        disabled
+                        value={state?.Transport.Available_Date}
+                        className=" bg-white text-base border-transparent py-1 pl-0 font-semibold"
+                      />
+                      <PencilSvg
+                        className="absolute right-0"
+                        onClick={setclickOnInputCard}
+                      />
+                    </div>
+                  </div>
+
+                  {!editInput.vehicle ? (
+                    <InputCard
+                      pen={true}
+                      title={"Vehicle"}
+                      name={`${state?.Transport.Vehicles[0].v_year} ${state?.Transport.Vehicles[0].v_make} ${state?.Transport.Vehicles[0].v_model}`}
+                      setClickOnInputCard={handleVehicleEditClick}
+                    />
+                  ) : (
+                    <div className="grid w-10/12 lg:w-full grid-cols-3 grid-rows-4 items-center">
+                      <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
+                        <label>Vehicle</label>
+                      </div>
+
+                      <EditInputField
+                        className="col-span-2"
+                        value={selectedYearOption}
+                        onChange={(value) => setSelectedYearOption(value)}
+                        options={yearOptions}
+                      />
+                      <div className="auto-cols-min" />
+                      <EditInputField
+                        className="col-span-2"
+                        value={selectedBrandOption}
+                        onChange={(value) => setSelectedBrandOption(value)}
+                        options={brandOptions}
+                      />
+
+                      <div />
+                      <EditInputField
+                        className="col-span-2"
+                        value={selectedModalOption}
+                        onChange={(value) => setSelectedModalOption(value)}
+                        options={modalOptions}
+                      />
+                      <div />
+                      <div className="flex gap-x-1">
+                        <button
+                          onClick={handleVehicleUpdate}
+                          className="bg-blue-500 py-3 px-5 text-white"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleVehicleEditClick}
+                          className="bg-white py-3 px-5 text-gray-400"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {!editInput.zipCodeFrom ? (
+                    <InputCard
+                      className="col-span-2"
+                      pen={true}
+                      title={"Ship From"}
+                      setClickOnInputCard={handleZipFromEditClick}
+                      name={`${state?.Transport.Origin.City}, ${state?.Transport.Origin.State} ${state?.Transport.Origin.Zipcode}`}
+                    />
+                  ) : (
+                    <div className="grid w-10/12 lg:w-full grid-cols-3 grid-row-2 items-center">
+                      <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
+                        <label>Ship From</label>
+                      </div>
+                      <EditInputField
+                        className="col-span-2"
+                        value={zipCodeFromOption}
+                        onValueChange={(value) => setFromZipCodeValue(value)}
+                        onChange={(value) =>
+                          setSelectedZipCodeFromOption(value)
+                        }
+                        options={zipCodeFromOptions}
+                      />
+                      <div />
+                      <div className="flex gap-x-1">
+                        <button
+                          onClick={handleZipFromUpdate}
+                          className="bg-blue-500 py-3 px-5 text-white"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleZipFromEditClick}
+                          className="bg-white py-3 px-5 text-gray-400"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {!editInput.zipCodeTo ? (
+                    <InputCard
+                      pen={true}
+                      className="col-span-2"
+                      title={"Ship To"}
+                      setClickOnInputCard={handleZipToEditClick}
+                      name={`${state?.Transport.Destination.City}, ${state?.Transport.Destination.State} ${state?.Transport.Destination.Zipcode}`}
+                    />
+                  ) : (
+                    <div className="grid w-10/12 lg:w-full grid-cols-3 grid-row-2 items-center">
+                      <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
+                        <label>Ship To</label>
+                      </div>
+                      <EditInputField
+                        className="col-span-2"
+                        value={zipCodeToOption}
+                        onValueChange={(value) => setToZipCodeValue(value)}
+                        onChange={(value) => setSelectedZipCodeToOption(value)}
+                        options={zipCodeToOptions}
+                      />
+                      <div />
+                      <div className="flex gap-x-1">
+                        <button
+                          onClick={handleZipToUpdate}
+                          className="bg-blue-500 py-3 px-5 text-white"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleZipToEditClick}
+                          className="bg-white py-3 px-5 text-gray-400"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <InputCard
+                    info={true}
+                    condition={true}
+                    setVehicleCondition={handleVehicleConditionUpdate}
+                    title={"Vehicle condition"}
+                    tooltip={
+                      <p>
+                        <strong>Running</strong>
+                        <br />
+                        The ability of the vehicle to move under its own power
+                        to be driven on and off the transport trailer
+                        <br />
+                        <br />
+                        <strong>Non-Running</strong>
+                        <br />
+                        The vehicle doesn't move under its own power, but it
+                        must roll, break and steer.
+                      </p>
                     }
-                  >
-                    <span className="cursor-pointer">
-                      <InfoSvg />
-                    </span>
-                  </Tippy>
-                </div>
-
-                <div className="w-full relative flex items-center">
-                  <input
-                    type="date"
-                    name="availableDate"
-                    value={availableDate}
-                    className="opacity-0 absolute z-50 w-full input-cursor-pointer"
                   />
-                  <input
-                    type="text"
-                    disabled
-                    value={state?.Transport.Available_Date}
-                    className=" bg-white border-transparent py-1 pl-0 font-semibold sm:text-sm"
-                  />
-                  <PencilSvg
-                    className="absolute right-0"
-                    onClick={setclickOnInputCard}
-                  />
-                </div>
-              </div>
-
-              {!editInput.vehicle ? (
-                <InputCard
-                  pen={true}
-                  title={"Vehicle"}
-                  name={"2021 Audi A5 Sportback"}
-                  setClickOnInputCard={handleVehicleEditClick}
-                />
-              ) : (
-                <div className="grid grid-cols-3 grid-rows-4 items-center">
-                  <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
-                    <label>Vehicle</label>
-                  </div>
-
-                  <EditInputField
-                    className="col-span-2"
-                    value={selectedYearOption}
-                    onChange={(value) => setSelectedYearOption(value)}
-                    options={yearOptions}
-                  />
-                  <div className="auto-cols-min" />
-                  <EditInputField
-                    className="col-span-2"
-                    value={selectedBrandOption}
-                    onChange={(value) => setSelectedBrandOption(value)}
-                    options={brandOptions}
-                  />
-
-                  <div />
-                  <EditInputField
-                    className="col-span-2"
-                    value={selectedModalOption}
-                    onChange={(value) => setSelectedModalOption(value)}
-                    options={modalOptions}
-                  />
-                  <div />
-                  <div className="flex gap-x-1">
-                    <button className="bg-blue-500 py-3 px-5 text-white">
-                      Save
-                    </button>
-                    <button
-                      onClick={handleVehicleEditClick}
-                      className="bg-white py-3 px-5 text-gray-400"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {!editInput.zipCodeFrom ? (
-                <InputCard
-                  className="col-span-2"
-                  pen={true}
-                  title={"Ship From"}
-                  setClickOnInputCard={handleZipFromEditClick}
-                  name={"Dallas,TX 75217"}
-                />
-              ) : (
-                <div className="grid grid-cols-3 grid-row-2 items-center">
-                  <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
-                    <label>Ship From</label>
-                  </div>
-                  <EditInputField
-                    className="col-span-2"
-                    value={zipCodeFromOption}
-                    onValueChange={(value) =>
-                      setFromZipCodeValue(value)
+                  <InputCard
+                    info={true}
+                    transport={true}
+                    title={"Transport type"}
+                    setCarrierCondition={handleCarrierUpdate}
+                    tooltip={
+                      <p>
+                        <strong>Open trailers</strong> are the most
+                        cost-effective and popular method to transport vehicles.
+                        Most new vehicles being sent to car dealerships are
+                        transported in open trailers.
+                        <br />
+                        <br />
+                        <strong>Enclosed trailers</strong> protect vehicles from
+                        weather, dirt and rock chips during transport. They are
+                        popular for high value vehicles.
+                      </p>
                     }
-                    onChange={(value) => setSelectedZipCodeFromOption(value)}
-                    options={zipCodeFromOptions}
                   />
-                  <div />
-                  <div className="flex gap-x-1">
-                    <button className="bg-blue-500 py-3 px-5 text-white">
-                      Save
-                    </button>
-                    <button
-                      onClick={handleZipFromEditClick}
-                      className="bg-white py-3 px-5 text-gray-400"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {!editInput.zipCodeTo ? (
-                <InputCard
-                  pen={true}
-                  className="col-span-2"
-                  title={"Ship To"}
-                  setClickOnInputCard={handleZipToEditClick}
-                  name={"Austin, TX 78745"}
-                />
-              ) : (
-                <div className="grid grid-cols-3 grid-row-2 items-center">
-                  <div className="auto-cols-min pl-4 font-circular-book text-gray-400 text-base leading-none">
-                    <label>Ship To</label>
-                  </div>
-                  <EditInputField
-                    className="col-span-2"
-                    value={zipCodeToOption}
-                    onValueChange={(value) => setToZipCodeValue(value)}
-                    onChange={(value) => setSelectedZipCodeToOption(value)}
-                    options={zipCodeToOptions}
+                  <InputCard
+                    info={true}
+                    tooltip={
+                      "The car will be pick up and delivered as close as legally and safely possible to any residential and/or business address."
+                    }
+                    title={"Service type"}
+                    name={"Door to door"}
                   />
-                  <div />
-                  <div className="flex gap-x-1">
-                    <button className="bg-blue-500 py-3 px-5 text-white">
-                      Save
-                    </button>
-                    <button
-                      onClick={handleZipToEditClick}
-                      className="bg-white py-3 px-5 text-gray-400"
-                    >
-                      Close
-                    </button>
-                  </div>
+                  <InputCard
+                    tooltip={
+                      "Your vehicle is fully insured from pickup to delivery with no deductible to you."
+                    }
+                    info={true}
+                    title={"Insurance"}
+                    name={"Included"}
+                  />
+                  <InputCard
+                    tooltip={
+                      "Transit time is calculated from the time the vehicle is picked up."
+                    }
+                    info={true}
+                    title={"Transit time"}
+                    name={transitTime}
+                  />
+                  <DueNow
+                    priceCardActive={totalCost}
+                    selectedPrice={totalCost}
+                  />
                 </div>
-              )}
-
-              <InputCard
-                info={true}
-                condition={true}
-                title={"Vehicle condition"}
-                tooltip={
-                  <p>
-                    <strong>Running</strong>
-                    <br />
-                    The ability of the vehicle to move under its own power to be
-                    driven on and off the transport trailer
-                    <br />
-                    <br />
-                    <strong>Non-Running</strong>
-                    <br />
-                    The vehicle doesn't move under its own power, but it must
-                    roll, break and steer.
-                  </p>
-                }
-              />
-              <InputCard
-                info={true}
-                transport={true}
-                title={"Transport type"}
-                tooltip={
-                  <p>
-                    <strong>Open trailers</strong> are the most cost-effective
-                    and popular method to transport vehicles. Most new vehicles
-                    being sent to car dealerships are transported in open
-                    trailers.
-                    <br />
-                    <br />
-                    <strong>Enclosed trailers</strong> protect vehicles from
-                    weather, dirt and rock chips during transport. They are
-                    popular for high value vehicles.
-                  </p>
-                }
-              />
-              <InputCard
-                info={true}
-                tooltip={
-                  "The car will be pick up and delivered as close as legally and safely possible to any residential and/or business address."
-                }
-                title={"Service type"}
-                name={"Door to door"}
-              />
-              <InputCard
-                tooltip={
-                  "Your vehicle is fully insured from pickup to delivery with no deductible to you."
-                }
-                info={true}
-                title={"Insurance"}
-                name={"Included"}
-              />
-              <InputCard
-                tooltip={
-                  "Transit time is calculated from the time the vehicle is picked up."
-                }
-                info={true}
-                title={"Transit time"}
-                name={"2-4 days"}
-              />
-              <DueNow
-                priceCardActive={priceCardActive}
-                selectedPrice={selectedPrice}
-              />
-              <div className="font-circular-book px-4 py-2">
-                <span className="text-zinc-400 text-base leading-none">
-                  Have a promo code?
-                </span>
-                <span className="text-oceanBlue font-circular text-base leading-none">
-                  Enter
-                </span>
               </div>
             </div>
-          </div>
-        </div>
-      </ContentWrapper>
-    </main>
+          </ContentWrapper>
+        </main>
+      )}
+    </>
   );
 }

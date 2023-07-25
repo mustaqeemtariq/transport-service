@@ -8,6 +8,7 @@ const ServiceTopSection = ({
   setselectedPrice,
   setPriceCardActive,
   priceCardActive,
+  price,
 }) => {
   return (
     <div className="flex flex-col gap-12 max-sm:mt-4">
@@ -34,14 +35,14 @@ const ServiceTopSection = ({
           <PriceCard
             setselectedPrice={() => setselectedPrice(339)}
             title={"Discounted cash price"}
-            price={339}
+            price={price}
             setPriceCardActive={() => setPriceCardActive(1)}
             active={priceCardActive == 1}
           />
           <PriceCard
             setselectedPrice={() => setselectedPrice(349)}
             title={"Regular price"}
-            price={349}
+            price={price}
             setPriceCardActive={() => setPriceCardActive(2)}
             active={priceCardActive == 2}
           />

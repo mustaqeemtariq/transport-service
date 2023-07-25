@@ -3,6 +3,7 @@ import InfoSvg from "../Svg/InfoSvg";
 import PencilSvg from "../Svg/PencilSvg";
 import Tippy from "@tippyjs/react";
 import Select from "react-select";
+import { useAppState } from '../../pages/appContext';
 
 const options = [
   { value: "chocolate", label: "Chocolate" },
@@ -12,6 +13,8 @@ const options = [
 const InputCard = ({
   title,
   name,
+  setVehicleCondition,
+  setCarrierCondition,
   info,
   condition,
   transport,
@@ -20,6 +23,7 @@ const InputCard = ({
   setClickOnInputCard,
   onClose,
 }) => {
+  const { state } = useAppState();
   return (
     <div className="w-fullborder-b flex items-center gap-8 px-4 py-4">
       <div className="flex items-center gap-3 min-w-[114px]">
@@ -46,6 +50,9 @@ const InputCard = ({
               type="radio"
               name="running"
               id="isRunning1"
+              value="1"
+              onChange={setVehicleCondition}
+              checked={state?.Transport.Vehicles[0].veh_op === "1"}
             />
             <div className="text-mildBlack text-base leading-none">Running</div>
           </label>
@@ -58,6 +65,9 @@ const InputCard = ({
               type="radio"
               name="running"
               id="isRunning2"
+              value="0"
+              onChange={setVehicleCondition}
+              checked={state?.Transport.Vehicles[0].veh_op === "0"}
             />
             <div className="text-mildBlack text-base leading-none">
               Non-running
@@ -75,6 +85,9 @@ const InputCard = ({
               type="radio"
               name="open"
               id="isOpen1"
+              value="Open"
+              onChange={setCarrierCondition}
+              checked={state?.Transport.Carrier === "Open"}
             />
             <div className="text-mildBlack text-base leading-none">Open</div>
           </label>
@@ -87,6 +100,9 @@ const InputCard = ({
               type="radio"
               name="open"
               id="isOpen2"
+              value="Enclosed"
+              onChange={setCarrierCondition}
+              checked={state?.Transport.Carrier === "Enclosed"}
             />
             <div className="text-mildBlack text-base leading-none">
               Enclosed (+$220)

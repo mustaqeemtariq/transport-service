@@ -33,9 +33,9 @@ import vehicleService from "@/components/Services/vehicle";
 import moment from "moment";
 import costService from "@/components/Services/cost";
 
-import { useAppState } from '../../../pages/appContext';
-import { updateAppState } from '../../../pages/appContext';
-
+import { useAppState } from "../../../pages/appContext";
+import { updateAppState } from "../../../pages/appContext";
+import { Spinner } from "@/components/animation/spinner";
 
 const steps = ["Destinations", "Vehicle", "Date"];
 
@@ -50,7 +50,7 @@ const Form = () => {
 
   const [type, setType] = React.useState("Open");
   const [years, setYears] = React.useState("");
- 
+
   const [vehicleMake, setVehicleMake] = React.useState("");
 
   const [vehicleModel, setVehicleModel] = React.useState("");
@@ -75,20 +75,22 @@ const Form = () => {
 
   const [errorOne, setErrorOne] = useState(false);
   const [errorTwo, setErrorTwo] = useState(false);
-  const [yearData, setYearData] = useState([])
-  const [vehicleData, setVehicleData] = useState([])
-  const [modelData, setModelData] = useState([])
+  const [yearData, setYearData] = useState([]);
+  const [vehicleData, setVehicleData] = useState([]);
+  const [modelData, setModelData] = useState([]);
 
   useEffect(() => {
-    vehicleService.getYearsForVehicle().then(res => setYearData(res))
-    vehicleService.getNameForVehicle().then(res => setVehicleData(res))
-  }, [])
+    vehicleService.getYearsForVehicle().then((res) => setYearData(res));
+    vehicleService.getNameForVehicle().then((res) => setVehicleData(res));
+  }, []);
 
   useEffect(() => {
     if (years && vehicleMake) {
-      vehicleService.getModalForVehicle(years, vehicleMake).then(res => setModelData(res))
+      vehicleService
+        .getModalForVehicle(years, vehicleMake)
+        .then((res) => setModelData(res));
     }
-  }, [years, vehicleMake])
+  }, [years, vehicleMake]);
 
   useEffect(() => {
     if (Object.keys(fromCity).length !== 0) {
@@ -101,9 +103,7 @@ const Form = () => {
 
   // check step 2
   const stepTwo =
-    yearData.length === 0 &&
-    vehicleData.length === 0 &&
-    modelData.length === 0;
+    yearData.length === 0 && vehicleData.length === 0 && modelData.length === 0;
 
   const [stepError, setStepError] = useState(true);
 
@@ -214,27 +214,42 @@ const Form = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (delivery === "More than 30 days") return
-    let currentDate = new Date()
-    if (delivery === "Within 2 weeks"){
-      const twoWeeksFromNow = new Date(currentDate.getTime() + 14 * 24 * 60 * 60 * 1000);
-      currentDate = twoWeeksFromNow
+    if (delivery === "More than 30 days") return;
+    let currentDate = new Date();
+    if (delivery === "Within 2 weeks") {
+      const twoWeeksFromNow = new Date(
+        currentDate.getTime() + 14 * 24 * 60 * 60 * 1000
+      );
+      currentDate = twoWeeksFromNow;
+    } else if (delivery === "Within 30 days") {
+      const thirtyDaysFromNow = new Date(
+        currentDate.getTime() + 30 * 24 * 60 * 60 * 1000
+      );
+      currentDate = thirtyDaysFromNow;
     }
-    else if (delivery === "Within 30 days"){
-      const thirtyDaysFromNow = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-      currentDate = thirtyDaysFromNow
-    }
-    setDeliveryData(currentDate)
-  }, [delivery])
+    setDeliveryData(currentDate);
+  }, [delivery]);
 
+  // const calculateCost = (payload) => {
+  //   costService.getCost(payload).then(res => {
+  //     if (res.Message === "Quote Created"){
+  //       updateAppState(dispatch, payload)
+  //       router.push(`/calculate?cost=${res.Results.total}&transit=${res.Results.transit}`)
+  //     }
+  //   })
+  // }
+
+  const [isLoading, setIsLoading] = useState(false);
   const calculateCost = (payload) => {
-    costService.getCost(payload).then(res => {
-      if (res.Message === "Quote Created"){
-        updateAppState(dispatch, payload)
-        router.push(`/calculate`)
+    setIsLoading(true);
+    costService.getCost(payload).then((res) => {
+      if (res.Message === "Quote Created") {
+        updateAppState(dispatch, payload);
+        router.push(`/calculate`);
       }
-    })
-  }
+      setIsLoading(false);
+    });
+  };
 
   const handleNext = () => {
     if (activeStep === 2) {
@@ -242,37 +257,37 @@ const Form = () => {
       const emailValid = email !== "" || isEmailValid === true;
 
       if (emailValid && date) {
-        // setLoading(true);
+        setIsLoading(true);
         const payload = {
           Shipper: {
             Email: email,
-            Phone_1: phone
+            Phone_1: phone,
           },
           Transport: {
             Carrier: type,
             Origin: {
               City: fromCity.split(",")[0],
               State: fromCity.split(",")[1].split(" ")[1],
-              Zipcode: fromCity.split(" ")[2] 
+              Zipcode: fromCity.split(" ")[2],
             },
             Destination: {
               City: toCity.split(",")[0],
               State: toCity.split(",")[1].split(" ")[1],
-              Zipcode: toCity.split(" ")[2] 
+              Zipcode: toCity.split(" ")[2],
             },
             Vehicles: [
               {
                 v_year: years,
                 v_make: vehicleMake,
                 v_model: vehicleModel,
-                veh_op: operable === "yes" ? "1" : "0"
-              }
+                veh_op: operable === "yes" ? "1" : "0",
+              },
             ],
-            Available_Date: moment(deliveryData).format("DD-MM-YYYY")
-          }
-        }
+            Available_Date: moment(deliveryData).format("DD-MM-YYYY"),
+          },
+        };
 
-        calculateCost(payload)
+        calculateCost(payload);
 
         // router.push("/calculate");
       }
@@ -430,7 +445,9 @@ const Form = () => {
                 formOpen={formOpen === 3}
                 setFormOpen={setFormOpen}
                 num={3}
-                disable={vehicleMake.length === 0 || years.length === 0 ? true : false}
+                disable={
+                  vehicleMake.length === 0 || years.length === 0 ? true : false
+                }
               />
             </Box>
 
@@ -513,10 +530,7 @@ const Form = () => {
             </Box>
 
             <Box sx={{ marginTop: "4px" }}>
-              <CustomPhoneInput 
-                setPhone = {setPhone}
-                value={phone}
-              />
+              <CustomPhoneInput setPhone={setPhone} value={phone} />
             </Box>
 
             {/*  */}
@@ -589,13 +603,26 @@ const Form = () => {
         {activeStep === 2 && (
           <button
             onClick={handleNext}
-            // variant="contained"
             className={styles._submit_button}
-            disabled={stepError}
-            style={{ opacity: stepError ? "0.5" : "1" }}
-            // disableRipple
+            disabled={stepError || isLoading}
+            style={{ opacity: stepError || isLoading ? "0.5" : "1" }}
           >
-            Calculate cost <ArrowForwardIcon />
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {isLoading ? (
+                <span>
+                  <Spinner
+                    className="w-7 h-7"
+                    style={{ marginRight: "8px" }}
+                  />
+                  Calculating
+                </span>
+              ) : (
+                <span>
+                  <ArrowForwardIcon style={{ marginRight: "8px" }} /> Calculate
+                  cost
+                </span>
+              )}
+            </div>
           </button>
         )}
 

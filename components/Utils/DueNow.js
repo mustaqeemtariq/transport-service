@@ -21,7 +21,7 @@ const DueNow = ({ selectedPrice, priceCardActive }) => {
         </div>
         <div className="flex items-center gap-4">
           <div className="text-oceanBlue font-circular text-[38px] font-bold leading-10">
-            $0
+            {selectedPrice}
           </div>
           <div className="w-[153px] font-circular-book font-stroke-point-3 text-mildBlack text-xs leading-[18px]">
             Don’t worry-you won’t pay until your pickup is scheduled.
